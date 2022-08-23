@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <link rel="preload" href="./index.js" as="script">
+        <link rel="preload" href="./worker.js" as="worker">
+        <title>Wordl Alphabet Cover Problem - waldin.net</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font: inherit;
+            }
+            html {
+                -webkit-text-size-adjust: 80%;
+                font: normal 1rem helvetica, 'san-serif';
+            }
+            body {
+                position: absolute;
+                inset: 0;
+                width: 100vw;
+                height: 100%;
+                padding: 1.5rem 1.7rem;
+                display: grid;
+                grid-auto-flow: row;
+                grid-template: auto 1fr / auto;
+                place-items: start;
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+            header {
+                width: 100%;
+            }
+            h1, h2 {
+                font-weight: bold;
+            }
+            h1 {
+                border-block-end: 2px solid black;
+                font-size: 1.6rem;
+                text-transform: uppercase;
+            }
+            h2 {
+                font-size: 1.4rem;
+                margin-block-start: 1.5rem;
+                border-block-end: 1px solid black;
+            }
+            main {
+                position: relative;
+                width: 100%;
+                display: grid;
+                grid-auto-flow: column;
+                grid-template: 'article stats' auto 'article aside' auto 'form aside' 1fr / 1fr 550px;
+                column-gap: 3rem;
+                overflow: hidden;
+            }
+            article {
+                grid-area: article;
+                padding-block-end: 1rem;
+            }
+            aside {
+                grid-area: aside;
+                margin-block-end: 1rem;
+            }
+            #solveFormElem {
+                grid-area: form;
+                padding-inline: 1rem;
+            }
+            div.stats {
+                grid-area: stats;
+            }
+            div.stats form {
+                display: grid;
+                grid-auto-flow: column;
+                grid-template: repeat(4, 1fr) / repeat(2, 1fr);
+            }
+            p {
+                margin-block: 0.25rem 1rem;
+            }
+            p:last-child {
+                margin-block-end: 0.25rem;
+            }
+            label {
+                display: block;
+                cursor: pointer;
+                margin-block: 0.25rem;
+            }
+            label label {
+                display: inline-block;
+                margin-block: 0;
+            }
+            input {
+                margin-inline-end: 0.5rem;
+            }
+            output::before {
+                content: ': ';
+            }
+            ol {
+                overflow-y: auto;
+                height: calc(100vh - 12rem - 120px);
+            }
+            li {
+                margin-inline-start: 4.5ch;
+            }
+            a,
+            a:visited, 
+            a:active {
+                color: hsl(220 50% 50%/100%);
+            }
+            a:hover {
+                color: hsl(220 100% 50%/100%); 
+            }
+            button {
+                border-radius: 0.25rem;
+                border: 0;
+                padding: 0.25rem 1rem;
+                margin: 0.5rem 0;
+                width: 12ch;
+                font-size: 1.2rem;
+                background-color: hsl(220 50% 50%/100%);
+                color: white;
+                cursor: pointer;
+            }
+            button:active {
+                background-color: hsl(220 50% 35%/100%);
+            }
+            button[disabled] {
+                background-color: hsl(220 50% 50%/60%);
+                cursor: not-allowed;
+            }
+            @media screen and (max-width: 1279px) {
+                main {
+                    grid-template: 'article stats' auto 'article aside' auto 'form aside' 1fr / 1fr 380px;
+                }
+                output::before {
+                    content: '';
+                }
+                output {
+                    display: block;
+                    font-weight: normal;
+                }
+                div.stats label {
+                    font-weight: 800;
+                }
+            }
+            @media screen and (max-width: 1023px) {
+                main {
+                    grid-auto-flow: row;
+                    grid-template: 'article' 1fr 'form' auto 'stats' auto 'aside' auto
+                }
+                aside {
+                    align-self: start;
+                }
+                ol {
+                    height: 40vh;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <header><h1>Wordl Alphabet Cover Problem</h1></header>
+        <main>
+            <article>
+                <h2>Problem</h2>
+                <p>
+                    Given a word list (any text file with one word per line), find all combinations of 5 5-letter words that together use
+                    each letter of the lowercase alphabet [a-z] once at most. This problem was first posed by Matt Parker of Stand Up Maths
+                    in this video: <a target="_blank" href="https://youtu.be/_-AfhLQfb6w">Can you find: five five-letter words with twenty-five unique letters?</a>. Check it out for a more exhaustive description of the problem.
+                </p>
+                <h2>Solution</h2>
+                <p>The solutions presented so far include: <ul>
+                    <li>Matt's original solutions: <a target="_blank" href="https://youtu.be/_-AfhLQfb6w">Can you find: five five-letter words with twenty-five unique letters?</a></li>
+                    <li>Benjamin Paassen's solution using graph theory mentioned in Matt's video: <a target="_blank" href="https://gitlab.com/bpaassen/five_clique">five_clique</a></li>
+                    <li>Fred Overflow's hand crafted solutions in Java: <ul>
+                        <li><a target="_blank" href="https://youtu.be/947Ewgue4DM">I solved Matt Parker's Wordle puzzle 100000 times faster (Summer of Math Exposition 2)</a></li>
+                        <li><a target="_blank" href="https://youtu.be/bSSEwbfq2Ig">Another 10x speedup — just 3 seconds for Matt Parker's Wordle puzzle now</a></li>
+                        <li><a target="_blank" href="https://youtu.be/GTsP8ss5gjk">I finally broke the 1 second barrier for Matt Parker's Wordle puzzle!</a></li>
+                    </ul></li>
+                </ul></p>
+                <p>
+                    The solution presented on this page is different from those listed above in several ways. First it's written in Javascript and so it runs right here on this page in your browser, and the source code is viewable in your browser's dev tools. Second, it is based on my implementation of Donald Knuth's <a target="_blank" href="https://en.wikipedia.org/wiki/Dancing_Links">Dancing Links</a> technique to solve the exact cover problem with <a target="_blank" href="https://en.wikipedia.org/wiki/Knuth%27s_Algorithm_X">Algorithm X</a>. And lastly, it's multithreaded, using web workers to concurrently solve subsets of the main problem.
+                </p>
+                <p>
+                    <a target="_blank" href="https://en.wikipedia.org/wiki/Knuth%27s_Algorithm_X">Algorithm X</a> solves exact cover problems by looking for combinations of options that exactly cover the given requirements. The requirements for this problem, however, do not directly lend themselves to being solved as an exact cover problem because every valid solution leaves one letter unused.  In order to pose this problem as an exact cover problem, we break it up into 26 smaller exact cover problems, each considering a different 25 character alphabet (and word set) that excludes a single character from [a-z].  These sub-problems are then solved independently in separate concurrent worker threads.
+                </p>
+                
+                <p>
+                    Performance will depend on your hardware, operating system, browser, and the number of concurrent workers available. On my M1Pro MacBook Pro in Safari 15.2 (WebKitCore JS engine), the shorter Wordl list can be solved in ~0.6 seconds while solving the larger words_alpha.txt file takes ~1 second.  Solving for the intersection of these two word lists takes ~0.3 seconds.  Times are approximately 15% to 20% slower in Chrome 104 (V8 JS engine). YMMV.
+                </p>
+                <h2>Try it for yourself</h2>
+                <p>Choose a word list below, or load a word list from your local filesystem.</p>
+            </article>
+            <form id="solveForm">
+                <label
+                    ><input
+                        type="radio"
+                        name="wordList"
+                        value="https://raw.githubusercontent.com/tabatkins/wordle-list/main/words"
+                    />Wordl list from <a target="_blank" href="https://raw.githubusercontent.com/tabatkins/wordle-list/main/words">https://raw.githubusercontent.com/tabatkins/wordle-list/main/words</a></label
+                >
+                <label
+                    ><input
+                        type="radio"
+                        name="wordList"
+                        value="https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt"
+                    />Word list from <a target="_blank" href="https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt">https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt</a></label
+                >
+                <label><input checked type="radio" name="wordList" value="intersection" />Words that appear in both of the above word lists.</label>
+                <label
+                    ><input type="radio" name="wordList" value="custom" />Load custom word list:
+                    <input type="file" accept="text/plain" name="customWordFile" /></label>
+                <label
+                    >Concurrent workers:
+                    <select name="concurrency"></select
+                ></label>
+                <button name="solveButton">Solve</button>
+            </form>
+            <div class="stats">
+                <h2>Stats</h2>
+                <form id="outputForm">
+                    <label>Word count<output name="wordCount">0</output></label>
+                    <label>5-letter word count<output name="fiveLetterWordCount">0</output></label>
+                    <label>Normalized word count<output name="normalizedWordCount">0</output></label>
+                    <label>Solution count<output name="solutionCount">0</output></label>
+                    <label>Elapsed time<output name="elapsedTime">0 seconds</output></label>
+                    <label>Work items remaining<output name="workItems">0</output></label>
+                    <label>Workers working<output name="workersWorking">0</output></label>
+                </form>
+            </div>
+            <aside>
+                <h2>Solutions</h2>
+                <ol id="solutionsElem"></ol>
+            </aside>
+        </main>
+        <script src="./index.js"></script>
+    </body>
+</html>
